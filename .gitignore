@@ -1,0 +1,8 @@
+*.pyc
+build/
+dist/
+sco_worker.egg-info/
+scoworker/venv/
+scoworker/sco
+tests/data
+resources/

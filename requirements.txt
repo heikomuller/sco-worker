@@ -1,0 +1,5 @@
+pika
+neuropythy
+sco-datastore
+sco-engine
+sco-client
