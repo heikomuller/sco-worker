@@ -107,6 +107,7 @@ class SCODataStoreWorker(SCOWorker):
             if image_group is None:
                 raise ValueError('unknown image group: ' + experiment.images)
         except ValueError as ex:
+            logging.exception(ex)
             # In case of an exception set run state to failed and return
             self.db.experiments_predictions_update_state_error(
                 model_run.experiment,
@@ -126,6 +127,7 @@ class SCODataStoreWorker(SCOWorker):
         try:
             tar_file = sco_run(model_run, subject, image_group, temp_dir)
         except Exception as ex:
+            logging.exception(ex)
             # In case of an exception set run state to failed and return
             self.db.experiments_predictions_update_state_error(
                 model_run.experiment,

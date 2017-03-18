@@ -45,14 +45,14 @@ class TestSCODataStoreWorker(unittest.TestCase):
         files. Run experiment to validate code."""
         # Create subject, image group and experiment
         subject = self.sco.subjects_create(self.SUBJECT_FILE)
-        images = self.sco.image_groups_create(self.IMAGES_ARCHIVE)
+        images = self.sco.image_groups_create(self.IMAGES_ARCHIVE, options={'pixels_per_degree' : 12})
         experiment = self.sco.experiments_create(
             'Test Experiment',
             subject.identifier,
             images.identifier,
         )
         # Create new model run
-        model_run = experiment.run('Test Run')
+        model_run = experiment.run('benson17', 'Test Run')
         SCOClientWorker(self.sco, ENV_DIR).run(
             ModelRunRequest(
                 model_run.identifier,

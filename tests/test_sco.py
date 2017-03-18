@@ -24,10 +24,7 @@ opts = {
 
 add_subject_path(env_dir)
 
-results = sco.calc_sco(
-    opts,
-    subject=subject_dir,
-    stimulus_image_filenames=image_files
-)
+mdl = sco.build_model('benson17', force_exports=True)
+res = mdl(subject=subject_dir, stimulus=image_files, ground_truth_filename=None, pixels_per_degree=12, output_directory='./data/output')
 
-print results
+print res
