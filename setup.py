@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='sco-worker',
-    version='0.1.0',
+    version='0.2.0',
     description='Library to to execute predictive model run requests',
     keywords='neuroscience vision cortex ',
     author='Heiko Mueller',
