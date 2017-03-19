@@ -48,10 +48,10 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
         args['ground_truth_filename'] = None
     # Add image group options
     for attr in image_group.options:
-        args[attr] = image_group.options[attr].value
+        args[attr] = convert_parameter_value(image_group.options[attr].value)
     # Add run options
     for attr in model_run.arguments:
-        args[attr] = model_run.arguments[attr].value
+        args[attr] = convert_parameter_value(model_run.arguments[attr].value)
     # Run model. Exceptions are not caught here to allow callers to adjust run
     # run states according to their respective implementations (i.e., remote or
     # local worker will use different methods to change run state).
@@ -69,3 +69,33 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
             t.add(os.path.join(output_dir, filename), arcname=filename)
     # Return tar-file
     return tar_file
+
+
+def convert_parameter_value(db_value):
+    """Converter for parameter values. Converts a parameter value from its
+    storage format in the database into the representation that is expected by
+    the SCO model.
+
+    This is a (temporary) work-around for dictionaries that have integer values
+    as their keys. These dictionares cannot be stored directly in MongoDB
+    (keys have to be string). Thus, this function converts the type of the
+    dictionary key from string to integer. All other types of parameters remain
+    untouched.
+
+    Parameters
+    ----------
+    db_value : any
+        Parameter value as stored in the SCO Data Store
+
+    Returns
+    -------
+    any
+        Parameter value in format expected by SCO model.
+    """
+    if type(db_value) is dict:
+        result = {}
+        for key in db_value:
+            result[int(key)] = db_value[key]
+        return result
+    else:
+        return db_value
