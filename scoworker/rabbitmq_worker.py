@@ -158,7 +158,7 @@ if __name__ == '__main__':
             remote_worker = True
         elif opt in ('-u', '--user'):
             user = param
-        elif op in ('-v', '--vhost'):
+        elif opt in ('-v', '--vhost'):
             virtual_host = param
     # Ensure that mandatory parameter -e|--env was given
     if env_dir is None:
