@@ -9,7 +9,7 @@ import pika
 import sys
 
 from scocli import SCOClient
-from scodata.api import SCODataStore
+from scodata import SCODataStore
 from scodata.mongo import MongoDBFactory
 from scoengine import ModelRunRequest
 from scoworker import SCODataStoreWorker, SCOClientWorker
@@ -96,6 +96,7 @@ if __name__ == '__main__':
     """
     # Configuration parameter
     data_dir = '/tmp/sco'
+    mongo_db = 'sco'
     env_dir = None
     hostname = 'localhost'
     queue = 'sco'
@@ -110,8 +111,8 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            'c:d:e:h:q:l:p:s:u:v:',
-            ['data=', 'env=', 'host=', 'queue=', 'log=', 'password=', 'port=', 'server=', 'user=', 'vhost=']
+            'c:d:e:h:q:l:m:p:s:u:v:',
+            ['data=', 'env=', 'host=', 'queue=', 'log=', 'mongodb=', 'password=', 'port=', 'server=', 'user=', 'vhost=']
         )
     except getopt.GetoptError:
         print """rabbitmq_worker [parameters]
@@ -124,6 +125,7 @@ if __name__ == '__main__':
         -e, --env= <subject_dir>  : Path to directory for average subject [mandatory]
         -h, --host= <hostname>    : Name of host running RabbitMQ server (default: localhost)
         -l, --log= <filename>     : Log file name (default: standard output)
+        -m, --mongodb= <db-name>  : Name of MongoDB database for local datastore worker (default: sco)
         -p, --password <pwd>      : RabbitMQ user password (default: '')
         -q, --queue= <quename>    : Name of RabbitMQ message queue (default: sco)
         -s, --server <url>        : Url for SCO Web API server (only if remote worker is used)
@@ -146,6 +148,8 @@ if __name__ == '__main__':
             hostname = param
         elif opt in ('-l', '--log'):
             logfile = param
+        elif opt in ('-m', '--mongodb'):
+            mongo_db = param
         elif opt in ('-p', '--password'):
             password = param
         elif opt in ('-q', '--queue'):
@@ -185,7 +189,7 @@ if __name__ == '__main__':
         logging.info('Worker : [Remote]')
     else:
         worker = SCODataStoreWorker(
-            SCODataStore(MongoDBFactory(), data_dir),
+            SCODataStore(MongoDBFactory(db_name=mongo_db), data_dir),
             env_dir
         )
         logging.info('Worker : [Local]')
