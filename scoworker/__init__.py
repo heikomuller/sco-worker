@@ -134,7 +134,7 @@ class SCODataStoreWorker(SCOWorker):
                 model_run,
                 subject,
                 image_group,
-                temp_dir
+                temp_dir,
                 fmri_data=fmri_data
             )
         except Exception as ex:

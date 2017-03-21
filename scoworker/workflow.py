@@ -66,7 +66,8 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     tar_file = os.path.join(output_dir, 'results.tar.gz')
     with tarfile.open(tar_file, 'w:gz') as t:
         for filename in os.listdir(output_dir):
-            t.add(os.path.join(output_dir, filename), arcname=filename)
+            if filename != 'results.tar.gz':
+                t.add(os.path.join(output_dir, filename), arcname=filename)
     # Return tar-file
     return tar_file
 

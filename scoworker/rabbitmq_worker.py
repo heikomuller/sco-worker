@@ -88,6 +88,7 @@ if __name__ == '__main__':
     -e, --env= <subject_dir>  : Path to directory for average subject [mandatory]
     -h, --host= <hostname>    : Name of host running RabbitMQ server (default: localhost)
     -l, --log= <filename>     : Log file name (default: standard output)
+    -m, --mongodb= <db-name>  : Name of MongoDB database for local datastore worker (default: sco)
     -p, --password <pwd>      : RabbitMQ user password (default: '')
     -q, --queue= <quename>    : Name of RabbitMQ message queue (default: sco)
     -s, --server <url>        : Url for SCO Web API server (only if remote worker is used)
