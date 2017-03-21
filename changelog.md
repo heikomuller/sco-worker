@@ -12,3 +12,7 @@
 
 * Bug fix in rabbitmq_worker
 * Add MongoDB database name as command line argument for rabbitmq_worker
+
+### 0.3.0 - 2017-03-21
+
+* Pass optional experiment fMRI data to model run as ground truth data

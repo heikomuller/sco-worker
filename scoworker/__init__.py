@@ -106,6 +106,11 @@ class SCODataStoreWorker(SCOWorker):
             image_group = self.db.image_groups_get(experiment.images)
             if image_group is None:
                 raise ValueError('unknown image group: ' + experiment.images)
+            # Get optional fMRI data that is associated with the experiment
+            if not experiment.fmri_data is None:
+                fmri_data = self.db.experiments_fmri_get(experiment.identifier)
+            else:
+                fmri_data = None
         except ValueError as ex:
             logging.exception(ex)
             # In case of an exception set run state to failed and return
@@ -125,7 +130,13 @@ class SCODataStoreWorker(SCOWorker):
         # Temporal directory for run results
         temp_dir = tempfile.mkdtemp()
         try:
-            tar_file = sco_run(model_run, subject, image_group, temp_dir)
+            tar_file = sco_run(
+                model_run,
+                subject,
+                image_group,
+                temp_dir
+                fmri_data=fmri_data
+            )
         except Exception as ex:
             logging.exception(ex)
             # In case of an exception set run state to failed and return
@@ -225,7 +236,13 @@ class SCOClientWorker(SCOWorker):
         # Temporal directory for run results
         temp_dir = tempfile.mkdtemp()
         try:
-            tar_file = sco_run(model_run, subject, image_group, temp_dir)
+            tar_file = sco_run(
+                model_run,
+                subject,
+                image_group,
+                temp_dir,
+                fmri_data=experiment.fmri_data
+            )
         except Exception as ex:
             # In case of an exception set run state to failed and return
             model_run.update_state_error([type(ex).__name__ + ': ' + str(ex)])
