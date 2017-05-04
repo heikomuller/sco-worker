@@ -5,7 +5,8 @@ setup properly.
 from neuropythy.freesurfer import add_subject_path
 import os
 import sco
-
+import pimms
+import pint
 
 env_dir = os.path.abspath('./data/subjects')
 
@@ -16,15 +17,26 @@ image_files = [
     os.path.abspath('./data/images/tex-320x320-im18-smp1.png')
 ]
 
+d2p           = pimms.quant(128.0/20.0, 'px/deg')
+max_eccen     = pimms.quant(10.0, 'deg')
+
 opts = {
+    'stimulus': image_files,
+    'subject': subject_dir,
     'stimulus_edge_value': 0.5,
-    'max_eccentricity' : 12,
-    'gabor_orientations' : 8
+    'gabor_orientations' : 8,
+    'pixels_per_degree': d2p,
+    'normalized_pixels_per_degree' : d2p,
+    'max_eccentricity': max_eccen,
+    'aperture_edge_width': 0,
+    'aperture_radius': max_eccen,
+    'output_directory': './data/output',
+    'measurements_filename': None
 }
 
 add_subject_path(env_dir)
 
-mdl = sco.build_model('benson17', force_exports=True)
-res = mdl(subject=subject_dir, stimulus=image_files, ground_truth_filename=None, pixels_per_degree=12, output_directory='./data/output')
+model = sco.build_model('benson17')
+data  = model(opts)
 
-print res
+print data['exported_files']

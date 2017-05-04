@@ -20,3 +20,8 @@
 ### 0.3.1 - 2017-03-21
 
 * Fix minor bug in SCODataStoreWorker.run()
+
+
+### 0.3.2 - 2017-05-04
+
+* Adjust code to changes in sco-datastore 0.5

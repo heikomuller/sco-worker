@@ -43,9 +43,9 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     args = {'subject' : subject_dir, 'stimulus' : image_files, 'output_directory' : output_dir}
     # Set ground truth data (directory) if fMRI data handle is given
     if not fmri_data is None:
-        args['ground_truth_filename'] = fmri_data.directory
+        args['measurements_filename'] = fmri_data.directory
     else:
-        args['ground_truth_filename'] = None
+        args['measurements_filename'] = None
     # Add image group options
     for attr in image_group.options:
         args[attr] = convert_parameter_value(image_group.options[attr].value)
@@ -55,8 +55,12 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     # Run model. Exceptions are not caught here to allow callers to adjust run
     # run states according to their respective implementations (i.e., remote or
     # local worker will use different methods to change run state).
-    model = sco.build_model(model_run.model_id, force_exports=True)
-    model(**args)
+    print args
+    model = sco.build_model(model_run.model_id)
+    model = sco.build_model('benson17')
+    data  = model(args)
+    output_files = data['exported_files']
+    print output_files
     # Overwrite the generated images file with folders and names of images
     # in image group
     with open(os.path.join(output_dir, 'images.txt'), 'w') as f:

@@ -14,7 +14,7 @@ import logging
 from neuropythy.freesurfer import add_subject_path
 import shutil
 import tempfile
-import scodata.prediction as runs
+import scodata.modelrun as runs
 import scodata.funcdata as funcdata
 from scoworker.workflow import sco_run
 
@@ -95,19 +95,19 @@ class SCODataStoreWorker(SCOWorker):
         # FAILED) if either of the resources does not exist.
         try:
             # Get experiment. Raise exception if experiment does not exist.
-            experiment = self.db.experiments_get(model_run.experiment)
+            experiment = self.db.experiments_get(model_run.experiment_id)
             if experiment is None:
-                raise ValueError('unknown experiment: ' + model_run.experiment)
+                raise ValueError('unknown experiment: ' + model_run.experiment_id)
             # Get associated subject. Raise exception if subject does not exist
-            subject = self.db.subjects_get(experiment.subject)
+            subject = self.db.subjects_get(experiment.subject_id)
             if subject is None:
-                raise ValueError('unknown subject: ' + experiment.subject)
+                raise ValueError('unknown subject: ' + experiment.subject_id)
             # Get associated image group. Raise exception if image group does not exist
-            image_group = self.db.image_groups_get(experiment.images)
+            image_group = self.db.image_groups_get(experiment.image_group_id)
             if image_group is None:
-                raise ValueError('unknown image group: ' + experiment.images)
+                raise ValueError('unknown image group: ' + experiment.image_group_id)
             # Get optional fMRI data that is associated with the experiment
-            if not experiment.fmri_data is None:
+            if not experiment.fmri_data_id is None:
                 fmri_data = self.db.experiments_fmri_get(experiment.identifier)
             else:
                 fmri_data = None
@@ -115,7 +115,7 @@ class SCODataStoreWorker(SCOWorker):
             logging.exception(ex)
             # In case of an exception set run state to failed and return
             self.db.experiments_predictions_update_state_error(
-                model_run.experiment,
+                model_run.experiment_id,
                 model_run.identifier,
                 [str(ex)]
             )
@@ -124,7 +124,7 @@ class SCODataStoreWorker(SCOWorker):
         # workflow. Make sure to catch all exceptions.
         if model_run.state.is_idle:
             self.db.experiments_predictions_update_state_active(
-                model_run.experiment,
+                model_run.experiment_id,
                 model_run.identifier
             )
         # Temporal directory for run results
@@ -141,14 +141,14 @@ class SCODataStoreWorker(SCOWorker):
             logging.exception(ex)
             # In case of an exception set run state to failed and return
             self.db.experiments_predictions_update_state_error(
-                model_run.experiment,
+                model_run.experiment_id,
                 model_run.identifier,
                 [type(ex).__name__ + ': ' + str(ex)]
             )
             return
         # Update run state to success by uploading resoult file
         self.db.experiments_predictions_update_state_success(
-            model_run.experiment,
+            model_run.experiment_id,
             model_run.identifier,
             tar_file
         )
