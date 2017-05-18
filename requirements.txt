@@ -1,6 +1,7 @@
 pika
 neuropythy>=0.2.26
 pimms>=0.1.8
+scikit-image
 sco-datastore>=0.5.0
 sco-engine
 sco-client
