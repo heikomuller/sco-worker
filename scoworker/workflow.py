@@ -32,8 +32,9 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
 
     Returns
     -------
-    string
-        Path to generated tar file
+    string, dict(string:string)
+        Path to generated prediction file and dictionary of additional
+        attachments
     """
     # Get subject directory
     subject_dir = subject.data_directory
@@ -55,25 +56,27 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     # Run model. Exceptions are not caught here to allow callers to adjust run
     # run states according to their respective implementations (i.e., remote or
     # local worker will use different methods to change run state).
-    print args
     model = sco.build_model(model_run.model_id)
     model = sco.build_model('benson17')
     data  = model(args)
     output_files = data['exported_files']
-    print output_files
+    prediction_file = os.path.join(output_dir, 'prediction.nii.gz')
+    attachments = {}
     # Overwrite the generated images file with folders and names of images
     # in image group
-    with open(os.path.join(output_dir, 'images.txt'), 'w') as f:
+    image_list_file = os.path.join(output_dir, 'images.txt')
+    with open(image_list_file, 'w') as f:
         for img in image_group.images:
             f.write(img.folder + img.name + '\n')
-    # Create a tar file in the temp directory
-    tar_file = os.path.join(output_dir, 'results.tar.gz')
-    with tarfile.open(tar_file, 'w:gz') as t:
-        for filename in os.listdir(output_dir):
-            if filename != 'results.tar.gz':
-                t.add(os.path.join(output_dir, filename), arcname=filename)
-    # Return tar-file
-    return tar_file
+    # Add image list file as attachments
+    attachments[] = image_list_file
+
+    #
+    # Create additional attachments here
+    #
+
+    # Return information about generated files
+    return prediction_file, attachments
 
 
 def convert_parameter_value(db_value):

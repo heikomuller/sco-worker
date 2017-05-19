@@ -29,3 +29,7 @@
 ### 0.3.3 - 2017-05-19
 
 * Add missing dependencies
+
+### 0.3.4 - 2017-05-19
+
+* Adjust upload to handle prediction result and attachments

@@ -130,7 +130,7 @@ class SCODataStoreWorker(SCOWorker):
         # Temporal directory for run results
         temp_dir = tempfile.mkdtemp()
         try:
-            tar_file = sco_run(
+            prediction_file, attachements = sco_run(
                 model_run,
                 subject,
                 image_group,
@@ -150,8 +150,16 @@ class SCODataStoreWorker(SCOWorker):
         self.db.experiments_predictions_update_state_success(
             model_run.experiment_id,
             model_run.identifier,
-            tar_file
+            prediction_file
         )
+        # Upload any attachments returned by the model run
+        for resource_id in attachements:
+            self.db.experiments_predictions_attachments_create(
+                model_run.experiment_id,
+                model_run.identifier,
+                resource_id,
+                attachments[resource_id]
+            )
         # Clean-up
         shutil.rmtree(temp_dir)
 
