@@ -130,7 +130,7 @@ class SCODataStoreWorker(SCOWorker):
         # Temporal directory for run results
         temp_dir = tempfile.mkdtemp()
         try:
-            prediction_file, attachements = sco_run(
+            prediction_file, attachments = sco_run(
                 model_run,
                 subject,
                 image_group,
@@ -153,7 +153,7 @@ class SCODataStoreWorker(SCOWorker):
             prediction_file
         )
         # Upload any attachments returned by the model run
-        for resource_id in attachements:
+        for resource_id in attachments:
             self.db.experiments_predictions_attachments_create(
                 model_run.experiment_id,
                 model_run.identifier,
