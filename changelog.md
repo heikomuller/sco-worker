@@ -25,3 +25,7 @@
 ### 0.3.2 - 2017-05-04
 
 * Adjust code to changes in sco-datastore 0.5
+
+### 0.3.3 - 2017-05-19
+
+* Add missing dependencies
