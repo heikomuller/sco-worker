@@ -69,7 +69,7 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
         for img in image_group.images:
             f.write(img.folder + img.name + '\n')
     # Add image list file as attachments
-    attachments[] = image_list_file
+    attachments['input-image-list'] = image_list_file
 
     #
     # Create additional attachments here
