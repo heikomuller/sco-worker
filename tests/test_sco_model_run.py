@@ -70,17 +70,15 @@ class TestSCODataStoreWorker(unittest.TestCase):
         self.db.experiments_fmri_create(experiment.identifier, self.FUNC_DATA)
         # Create new model run
         args={
-            'stimulus_edge_value': 0.5,
             'gabor_orientations' : 8,
             'normalized_pixels_per_degree' : 6.4,
-            'max_eccentricity': 10.0,
-            'aperture_edge_width': 0,
-            'aperture_radius': 10.0,
+            'max_eccentricity': 10.0
         }
         model_def = self.models.get_model('benson17')
         model_run = self.db.experiments_predictions_create(
             experiment.identifier,
             model_def.identifier,
+            model_def.parameters,
             'Test Run',
             arguments=[{'name' : key, 'value' : args[key]} for key in args]
         )
