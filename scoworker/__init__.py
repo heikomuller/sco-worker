@@ -51,18 +51,21 @@ class SCODataStoreWorker(SCOWorker):
     store. Uses and instance of the SCODataStore to access and manipulate SCO
     resources.
     """
-    def __init__(self, db, env_subject):
+    def __init__(self, db, models, env_subject):
         """Initialize the data store instance and average subject path.
 
         Parameters
         ----------
         db : scodata.SCODataStore
             Connection to local SCO data store
+        models : scomodels.DefaultModelRegistry
+            Registry of SCO models
         env_subject : string
             Path to directory containing subject fsaverage_sym.
         """
         super(SCODataStoreWorker, self).__init__(env_subject)
         self.db = db
+        self.models = models
 
     def run(self, request):
         """Run SCO model for given request on a local instance of the SCO data
@@ -111,6 +114,10 @@ class SCODataStoreWorker(SCOWorker):
                 fmri_data = self.db.experiments_fmri_get(experiment.identifier)
             else:
                 fmri_data = None
+            # Get the model that os being run
+            model = self.models.get_model(model_run.model_id)
+            if model is None:
+                raise ValueError('unknown SCO model: ' + model_run.model_id)
         except ValueError as ex:
             logging.exception(ex)
             # In case of an exception set run state to failed and return
@@ -132,6 +139,7 @@ class SCODataStoreWorker(SCOWorker):
         try:
             prediction_file, attachments = sco_run(
                 model_run,
+                model,
                 subject,
                 image_group,
                 temp_dir,
@@ -154,11 +162,13 @@ class SCODataStoreWorker(SCOWorker):
         )
         # Upload any attachments returned by the model run
         for resource_id in attachments:
+            filename, mime_type = attachments[resource_id]
             self.db.experiments_predictions_attachments_create(
                 model_run.experiment_id,
                 model_run.identifier,
                 resource_id,
-                attachments[resource_id]
+                filename,
+                mime_type=mime_type
             )
         # Clean-up
         shutil.rmtree(temp_dir)

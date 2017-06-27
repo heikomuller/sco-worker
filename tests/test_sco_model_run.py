@@ -13,12 +13,14 @@ from scodata import SCODataStore
 from scodata.attribute import Attribute
 from scodata.mongo import MongoDBFactory
 from scoengine import ModelRunRequest
+from scomodels import DefaultModelRegistry, init_registry_from_json
 from scoworker import SCODataStoreWorker
 
 
 API_DIR = '/tmp/test_sco'
 ENV_DIR = os.path.abspath('./data/subjects')
 DATA_DIR = os.path.abspath('./data')
+MODELS_FILE = os.path.abspath('./config/models.json')
 
 
 class TestSCODataStoreWorker(unittest.TestCase):
@@ -37,8 +39,12 @@ class TestSCODataStoreWorker(unittest.TestCase):
             shutil.rmtree(API_DIR)
         # Drop test database
         MongoClient().drop_database('test_sco')
+        mongo = MongoDBFactory(db_name='test_sco')
+        # Load models
+        init_registry_from_json(mongo, MODELS_FILE)
         # Create fresh instance of SCO data store
-        self.db = SCODataStore(MongoDBFactory(db_name='test_sco'), API_DIR)
+        self.db = SCODataStore(mongo, API_DIR)
+        self.models = DefaultModelRegistry(mongo)
 
     def tearDown(self):
         """Delete data store directory and database."""
@@ -71,13 +77,14 @@ class TestSCODataStoreWorker(unittest.TestCase):
             'aperture_edge_width': 0,
             'aperture_radius': 10.0,
         }
+        model_def = self.models.get_model('benson17')
         model_run = self.db.experiments_predictions_create(
             experiment.identifier,
-            'benson17',
+            model_def.identifier,
             'Test Run',
             arguments=[{'name' : key, 'value' : args[key]} for key in args]
         )
-        SCODataStoreWorker(self.db, ENV_DIR).run(
+        SCODataStoreWorker(self.db, self.models, ENV_DIR).run(
             ModelRunRequest(
                 model_run.identifier,
                 experiment.identifier,
@@ -94,17 +101,26 @@ class TestSCODataStoreWorker(unittest.TestCase):
         # containing the list of images.\# Count the number of lines in the
         # images.txt file. This should be the same as the number of images in
         # the image group
-        self.assertTrue('input-image-list' in model_run.attachments)
+        self.assertTrue('images.txt' in model_run.attachments)
         line_count = 0
         image_list_file = self.db.experiments_predictions_attachments_download(
             experiment.identifier,
             model_run.identifier,
-            'input-image-list'
+            'images.txt'
         ).file
         with open(image_list_file, 'r') as f:
             for line in f:
                 line_count += 1
         self.assertEqual(line_count, len(images.images))
+        # All other attachments that are defined in the model should exist
+        for attmnt in model_def.outputs.attachments:
+            filename = self.db.experiments_predictions_attachments_download(
+                experiment.identifier,
+                model_run.identifier,
+                attmnt.filename
+            ).file
+            self.assertTrue(os.path.isfile(filename))
+
 
 if __name__ == '__main__':
     unittest.main()

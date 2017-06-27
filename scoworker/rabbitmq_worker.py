@@ -12,6 +12,7 @@ from scocli import SCOClient
 from scodata import SCODataStore
 from scodata.mongo import MongoDBFactory
 from scoengine import ModelRunRequest
+from scomodels import DefaultModelRegistry
 from scoworker import SCODataStoreWorker, SCOClientWorker
 
 
@@ -189,8 +190,10 @@ if __name__ == '__main__':
         )
         logging.info('Worker : [Remote]')
     else:
+        mongo = MongoDBFactory(db_name=mongo_db)
         worker = SCODataStoreWorker(
-            SCODataStore(MongoDBFactory(db_name=mongo_db), data_dir),
+            SCODataStore(mongo, data_dir),
+            DefaultModelRegistry(mongo),
             env_dir
         )
         logging.info('Worker : [Local]')

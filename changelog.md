@@ -33,3 +33,8 @@
 ### 0.3.4 - 2017-05-19
 
 * Adjust upload to handle prediction result and attachments
+
+### 0.4.0 - 2017-06-27
+
+* Fix bug with sco_run
+* Add handling of attachments that are defined as part of a model output

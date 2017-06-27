@@ -9,7 +9,7 @@ import tempfile
 import sco
 
 
-def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
+def sco_run(model_run, model_def, subject, image_group, output_dir, fmri_data=None):
     """Core method to run SCO predictive model. Expects resource handles for
     model run, subject, and image group. Creates results as tar file in given
     output directory.
@@ -19,6 +19,8 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     model_run : Model Run handle
         Handle for model run resource (either scocli.scoserv.ModelRunHandle or
         scodata.prediction.ModelRunHandle)
+    model_def : scomodels.ModelHandle
+        Descriptor for SCO model that is being used to generate the prediction
     subject : Subject handle
         Handle for subject resource (either scocli.scoserv.SubjectHandle or
         scodata.subject.SubjectHandle)
@@ -56,10 +58,10 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     # Run model. Exceptions are not caught here to allow callers to adjust run
     # run states according to their respective implementations (i.e., remote or
     # local worker will use different methods to change run state).
-    model = sco.build_model(model_run.model_id)
+    model = sco.build_model(model_def.identifier)
     data  = model(args)
     output_files = data['exported_files']
-    prediction_file = os.path.join(output_dir, 'prediction.nii.gz')
+    prediction_file = os.path.join(output_dir, model_def.outputs.prediction_filename)
     attachments = {}
     # Overwrite the generated images file with folders and names of images
     # in image group
@@ -68,8 +70,14 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
         for img in image_group.images:
             f.write(img.folder + img.name + '\n')
     # Add image list file as attachments
-    attachments['input-image-list'] = image_list_file
+    attachments['images.txt'] = (image_list_file, 'text/plain')
 
+    # Add further attachments that are defined in the model output list (if
+    # present)
+    for attmnt in model_def.outputs.attachments:
+        a_filename = os.path.join(output_dir, attmnt.filename)
+        if os.path.isfile(a_filename):
+            attachments[attmnt.filename] = (a_filename, attmnt.mime_type)
     #
     # Create additional attachments here
     #

@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='sco-worker',
-    version='0.3.4',
+    version='0.4.0',
     description='Library to to execute predictive model run requests',
     keywords='neuroscience vision cortex ',
     author='Heiko Mueller',
@@ -18,8 +18,9 @@ setup(
         'neuropythy >= "0.2.26"',
         'pimms >= "0.1.8"',
         'scikit-image',
-        'sco-datastore >= "0.5.0"',
+        'sco-datastore >= "0.6.0"',
         'sco-engine',
+        'sco-models >= 0.2.0',
         'sco-client'
     ]
 )
