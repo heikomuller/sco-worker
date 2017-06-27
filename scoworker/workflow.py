@@ -44,7 +44,7 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     args = {'subject' : subject_dir, 'stimulus' : image_files, 'output_directory' : output_dir}
     # Set ground truth data (directory) if fMRI data handle is given
     if not fmri_data is None:
-        args['measurements_filename'] = fmri_data.directory
+        args['measurements_filename'] = fmri_data.data_file
     else:
         args['measurements_filename'] = None
     # Add image group options
@@ -57,7 +57,6 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     # run states according to their respective implementations (i.e., remote or
     # local worker will use different methods to change run state).
     model = sco.build_model(model_run.model_id)
-    model = sco.build_model('benson17')
     data  = model(args)
     output_files = data['exported_files']
     prediction_file = os.path.join(output_dir, 'prediction.nii.gz')
@@ -74,6 +73,13 @@ def sco_run(model_run, subject, image_group, output_dir, fmri_data=None):
     #
     # Create additional attachments here
     #
+    #cortical_tar = create_cortical_image_tar(
+    #    data,
+    #    image_group.images,
+    #    args['measurements_filename'],
+    #    output_dir
+    #)
+    #attachments['cortical-image-list'] = cortical_tar
 
     # Return information about generated files
     return prediction_file, attachments
