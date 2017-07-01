@@ -12,8 +12,7 @@ from neuropythy.freesurfer import add_subject_path
 from scodata import SCODataStore
 from scodata.attribute import Attribute
 from scodata.mongo import MongoDBFactory
-from scoengine import ModelRunRequest
-from scomodels import DefaultModelRegistry, init_registry_from_json
+from scoengine import SCOEngine, ModelRunRequest, init_registry_from_json
 from scoworker import SCODataStoreWorker
 
 
@@ -44,11 +43,10 @@ class TestSCODataStoreWorker(unittest.TestCase):
         init_registry_from_json(mongo, MODELS_FILE)
         # Create fresh instance of SCO data store
         self.db = SCODataStore(mongo, API_DIR)
-        self.models = DefaultModelRegistry(mongo)
+        self.engine = SCOEngine(mongo)
 
     def tearDown(self):
         """Delete data store directory and database."""
-        pass
         shutil.rmtree(API_DIR)
         MongoClient().drop_database('test_sco')
 
@@ -74,7 +72,7 @@ class TestSCODataStoreWorker(unittest.TestCase):
             'normalized_pixels_per_degree' : 6.4,
             'max_eccentricity': 10.0
         }
-        model_def = self.models.get_model('benson17')
+        model_def = self.engine.get_model('benson17')
         model_run = self.db.experiments_predictions_create(
             experiment.identifier,
             model_def.identifier,
@@ -82,7 +80,7 @@ class TestSCODataStoreWorker(unittest.TestCase):
             'Test Run',
             arguments=[{'name' : key, 'value' : args[key]} for key in args]
         )
-        SCODataStoreWorker(self.db, self.models, ENV_DIR).run(
+        SCODataStoreWorker(self.db, self.engine, ENV_DIR).run(
             ModelRunRequest(
                 model_run.identifier,
                 experiment.identifier,

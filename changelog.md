@@ -38,3 +38,7 @@
 
 * Fix bug with sco_run
 * Add handling of attachments that are defined as part of a model output
+
+### 0.5.0 - 2017-06-29
+
+* Adjust to merge of sco-models into sco-engine and other API changes

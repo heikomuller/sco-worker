@@ -12,7 +12,6 @@ from scocli import SCOClient
 from scodata import SCODataStore
 from scodata.mongo import MongoDBFactory
 from scoengine import ModelRunRequest
-from scomodels import DefaultModelRegistry
 from scoworker import SCODataStoreWorker, SCOClientWorker
 
 
@@ -38,7 +37,7 @@ def callback(ch, method, properties, body):
     """
     # Read model run request (expects Json object)
     try:
-        request = ModelRunRequest.from_json(json.loads(body))
+        request = ModelRunRequest.from_dict(json.loads(body))
     except Exception as ex:
         logging.exception(ex)
         ch.basic_ack(delivery_tag = method.delivery_tag)
@@ -193,7 +192,7 @@ if __name__ == '__main__':
         mongo = MongoDBFactory(db_name=mongo_db)
         worker = SCODataStoreWorker(
             SCODataStore(mongo, data_dir),
-            DefaultModelRegistry(mongo),
+            SCOEngine(mongo),
             env_dir
         )
         logging.info('Worker : [Local]')

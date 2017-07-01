@@ -20,7 +20,6 @@ setup(
         'scikit-image',
         'sco-datastore >= "0.6.0"',
         'sco-engine',
-        'sco-models >= 0.2.0',
         'sco-client'
     ]
 )

@@ -51,21 +51,21 @@ class SCODataStoreWorker(SCOWorker):
     store. Uses and instance of the SCODataStore to access and manipulate SCO
     resources.
     """
-    def __init__(self, db, models, env_subject):
+    def __init__(self, db, engine, env_subject):
         """Initialize the data store instance and average subject path.
 
         Parameters
         ----------
         db : scodata.SCODataStore
             Connection to local SCO data store
-        models : scomodels.DefaultModelRegistry
+        engine : scoengine.SCOEngine
             Registry of SCO models
         env_subject : string
             Path to directory containing subject fsaverage_sym.
         """
         super(SCODataStoreWorker, self).__init__(env_subject)
         self.db = db
-        self.models = models
+        self.engine = engine
 
     def run(self, request):
         """Run SCO model for given request on a local instance of the SCO data
@@ -115,7 +115,7 @@ class SCODataStoreWorker(SCOWorker):
             else:
                 fmri_data = None
             # Get the model that os being run
-            model = self.models.get_model(model_run.model_id)
+            model = self.engine.get_model(model_run.model_id)
             if model is None:
                 raise ValueError('unknown SCO model: ' + model_run.model_id)
         except ValueError as ex:

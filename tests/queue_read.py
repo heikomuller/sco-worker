@@ -29,7 +29,7 @@ queue = 'sco'
 password = ''
 port = 5672
 user = 'sco'
-virtual_host = '/'
+virtual_host = '/sco'
 # Get command line arguments
 try:
     opts, args = getopt.getopt(
