@@ -11,7 +11,7 @@ import sys
 from scocli import SCOClient
 from scodata import SCODataStore
 from scodata.mongo import MongoDBFactory
-from scoengine import ModelRunRequest
+from scoengine import ModelRunRequest, SCOEngine
 from scoworker import SCODataStoreWorker, SCOClientWorker
 
 
