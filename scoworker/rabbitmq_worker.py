@@ -35,12 +35,16 @@ def callback(ch, method, properties, body):
     """Callback handler for client requests. Uses local worker, i.e. expects to
     be running on the same machine as the SCO data store.
     """
+    # Acknowledge that message is received. NOTE: There seems to be an issue
+    # with redelivering messages when we have multiple workers. Thus, for now
+    # we acknowledge immediately
+    ch.basic_ack(delivery_tag = method.delivery_tag)
     # Read model run request (expects Json object)
     try:
         request = ModelRunRequest.from_dict(json.loads(body))
     except Exception as ex:
         logging.exception(ex)
-        ch.basic_ack(delivery_tag = method.delivery_tag)
+        #ch.basic_ack(delivery_tag = method.delivery_tag)
         return
     # Request identifier for logging purposes
     req_id = request.experiment_id + ':' + request.run_id
@@ -48,7 +52,6 @@ def callback(ch, method, properties, body):
     logging.info('Start model run [' + req_id + ']')
     worker.run(request)
     logging.info('Done [' + req_id + ']')
-    ch.basic_ack(delivery_tag = method.delivery_tag)
 
 
 def handle_requests(hostname, port, virtual_host, queue, user, password):
