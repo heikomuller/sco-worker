@@ -61,7 +61,10 @@ def sco_run(model_run, model_def, subject, image_group, output_dir, fmri_data=No
     model = sco.build_model(model_def.identifier)
     data  = model(args)
     output_files = data['exported_files']
-    prediction_file = os.path.join(output_dir, model_def.outputs.prediction_filename)
+    prediction_file = os.path.join(
+        output_dir,
+        model_def.outputs.prediction_file.filename
+    )
     attachments = {}
     # Overwrite the generated images file with folders and names of images
     # in image group
@@ -75,7 +78,7 @@ def sco_run(model_run, model_def, subject, image_group, output_dir, fmri_data=No
     # Add further attachments that are defined in the model output list (if
     # present)
     for attmnt in model_def.outputs.attachments:
-        a_filename = os.path.join(output_dir, attmnt.filename)
+        a_filename = os.path.join(output_dir, attmnt.path)
         if os.path.isfile(a_filename):
             attachments[attmnt.filename] = (a_filename, attmnt.mime_type)
     #

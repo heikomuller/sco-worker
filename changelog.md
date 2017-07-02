@@ -42,3 +42,7 @@
 ### 0.5.0 - 2017-06-29
 
 * Adjust to merge of sco-models into sco-engine and other API changes
+
+### 0.5.1 - 2017-07-02
+
+* Adjust to new format of model run attachments
