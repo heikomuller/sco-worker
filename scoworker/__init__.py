@@ -114,7 +114,7 @@ class SCODataStoreWorker(SCOWorker):
                 fmri_data = self.db.experiments_fmri_get(experiment.identifier)
             else:
                 fmri_data = None
-            # Get the model that os being run
+            # Get the model that is being run
             model = self.engine.get_model(model_run.model_id)
             if model is None:
                 raise ValueError('unknown SCO model: ' + model_run.model_id)
@@ -204,7 +204,7 @@ class SCOClientWorker(SCOWorker):
         # Get model run handler from database. Ensure that it is in state IDLE
         # or RUNNING.
         try:
-            model_run = self.sco.experiments_runs_get(request.resource_url)
+            model_run = self.sco.experiments_predictions_get(request.resource_url)
             if model_run is None:
                 raise ValueError('unknown model run: ' + request.run_id + ':' + request.experiment_id)
             if not (model_run.state.is_idle or model_run.state.is_running):
@@ -221,9 +221,21 @@ class SCOClientWorker(SCOWorker):
             # Get experiment. Raise exception if experiment does not exist.
             experiment = model_run.experiment
         except ValueError as ex:
+            logging.exception(ex)
             # In case of an exception set run state to failed and return
             model_run.update_state_error([
                 'unknown experiment: ' + model_run.experiment_url,
+                str(ex)
+            ])
+            return
+        try:
+            # Get fMRI data. Raise exception if experiment does not exist.
+            fmri_data = experiment.fmri_data
+        except ValueError as ex:
+            logging.exception(ex)
+            # In case of an exception set run state to failed and return
+            model_run.update_state_error([
+                'unknown functional data: ' + experiment.fmri_url,
                 str(ex)
             ])
             return
@@ -241,11 +253,24 @@ class SCOClientWorker(SCOWorker):
             # Get associated image group. Raise exception if image group does not exist
             image_group = experiment.image_group
         except ValueError as ex:
+            logging.exception(ex)
             # In case of an exception set run state to failed and return
             model_run.update_state_error(
                 'unknown image group: ' + experiment.image_group_url,
                 [str(ex)]
             )
+            return
+        try:
+            # Get model that is being run. Raises an exception if the model does
+            # not exist
+            model = model_run.model
+        except ValueError as ex:
+            logging.exception(ex)
+            # In case of an exception set run state to failed and return
+            model_run.update_state_error([
+                'unknown model: ' + model_run.model_url,
+                str(ex)
+            ])
             return
         # Set run state to RUNNING (only if IDLE) and call generic run_sco
         # workflow. Make sure to catch all exceptions.
@@ -254,19 +279,29 @@ class SCOClientWorker(SCOWorker):
         # Temporal directory for run results
         temp_dir = tempfile.mkdtemp()
         try:
-            tar_file = sco_run(
+            prediction_file, attachments = sco_run(
                 model_run,
+                model,
                 subject,
                 image_group,
                 temp_dir,
-                fmri_data=experiment.fmri_data
+                fmri_data=fmri_data
             )
         except Exception as ex:
+            logging.exception(ex)
             # In case of an exception set run state to failed and return
             model_run.update_state_error([type(ex).__name__ + ': ' + str(ex)])
             return
         # Update run state to success. This will upload the given tar file as
         # model run result
-        model_run.update_state_success(tar_file)
+        model_run.update_state_success(prediction_file)
+
+        # Upload any attachments returned by the model run
+        for resource_id in attachments:
+            filename, mime_type = attachments[resource_id]
+            try:
+                model_run.attach_file(filename, resource_id=resource_id)
+            except ValueError as ex:
+                logging.exception(ex)
         # Clean-up
         shutil.rmtree(temp_dir)

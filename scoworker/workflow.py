@@ -1,6 +1,7 @@
 """Implements the run SCO model workflow for a given user request."""
 
 from abc import abstractmethod
+import logging
 import os
 import shutil
 import tarfile
@@ -58,6 +59,7 @@ def sco_run(model_run, model_def, subject, image_group, output_dir, fmri_data=No
     # Run model. Exceptions are not caught here to allow callers to adjust run
     # run states according to their respective implementations (i.e., remote or
     # local worker will use different methods to change run state).
+    logging.info('Run ' + model_def.identifier + ' with ' + str(args))
     model = sco.build_model(model_def.identifier)
     data  = model(args)
     output_files = data['exported_files']

@@ -46,3 +46,7 @@
 ### 0.5.1 - 2017-07-02
 
 * Adjust to new format of model run attachments
+
+### 0.5.2 - 2017-07-03
+
+* Fix bugs in remote worker
