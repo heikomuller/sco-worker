@@ -131,6 +131,14 @@
                 {
                     "filename" : "vega-corthist.csv",
                     "mimeType" : "text/csv"
+                },
+                {
+                    "filename" : "vega-corthist.json",
+                    "mimeType" : "application/json"
+                },
+                {
+                    "filename" : "cortical-images.tar.gz",
+                    "mimeType" : "application/gzip"
                 }
             ]
         },
@@ -276,6 +284,14 @@
                 {
                     "filename" : "vega-corthist.csv",
                     "mimeType" : "text/csv"
+                },
+                {
+                    "filename" : "vega-corthist.json",
+                    "mimeType" : "application/application"
+                },
+                {
+                    "filename" : "cortical-images.tar.gz",
+                    "mimeType" : "application/gzip"
                 }
             ]
         },

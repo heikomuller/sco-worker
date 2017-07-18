@@ -5,5 +5,4 @@ sco_worker.egg-info/
 scoworker/venv/
 scoworker/sco
 tests/data/
-tests/config/
 resources/
