@@ -110,17 +110,19 @@ class TestSCODataStoreWorker(unittest.TestCase):
         # All other attachments that are defined in the model should exist
         cort_images_file = None
         for attmnt in model_def.outputs.attachments:
-            filename = self.db.experiments_predictions_attachments_download(
+            attachment = self.db.experiments_predictions_attachments_download(
                 experiment.identifier,
                 model_run.identifier,
                 attmnt.filename
-            ).file
-            self.assertTrue(os.path.isfile(filename))
-            if attmnt.filename == 'cortical-images.tar.gz':
-                cort_images_file = filename
+            )
+            if not attachment is None:
+                filename = attachment.file
+                self.assertTrue(os.path.isfile(filename))
+                if attmnt.filename == 'cortical-images.tar.gz':
+                    cort_images_file = filename
         #self.assertIsNotNone(cort_images_file)
         if not cort_images_file is None:
-            self.assertTrue(validate_cortical_images_file(cort_images_file, 10, True))
+            self.assertTrue(validate_cortical_images_file(cort_images_file, 10, False))
 
     def test_successful_model_run_with_funcdata(self):
         """Test local SCO worker. Create experiment from subject and image group
@@ -183,20 +185,25 @@ class TestSCODataStoreWorker(unittest.TestCase):
         # All other attachments that are defined in the model should exist
         cort_images_file = None
         for attmnt in model_def.outputs.attachments:
-            filename = self.db.experiments_predictions_attachments_download(
+            attachment = self.db.experiments_predictions_attachments_download(
                 experiment.identifier,
                 model_run.identifier,
                 attmnt.filename
-            ).file
-            self.assertTrue(os.path.isfile(filename))
-            if attmnt.filename == 'cortical-images.tar.gz':
-                cort_images_file = filename
+            )
+            if not attachment is None:
+                filename = attachment.file
+                self.assertTrue(os.path.isfile(filename))
+                if attmnt.filename == 'cortical-images.tar.gz':
+                    cort_images_file = filename
         #self.assertIsNotNone(cort_images_file)
         if not cort_images_file is None:
             self.assertTrue(validate_cortical_images_file(cort_images_file, 10, True))
 
 
 def validate_cortical_images_file(filename, image_count, has_func_data):
+    # The filename should point to the zipped cortical image archive. The image
+    # count is the numner of input images. The has_func_data flag indicates
+    # whether the model was run with functional data or not.
     # Change the body of this function. Unzip and unpack the tar file into a
     # temporal directory. Count the number of images files that are in the
     # unpacked directory and return True if the number equals the image count
