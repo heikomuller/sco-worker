@@ -118,8 +118,8 @@ class TestSCODataStoreWorker(unittest.TestCase):
             self.assertTrue(os.path.isfile(filename))
             if attmnt.filename == 'cortical-images.tar.gz':
                 cort_images_file = filename
-        #self.assertNotIsNone(cort_images_file)
-        if not is None cort_images_file:
+        #self.assertIsNotNone(cort_images_file)
+        if not cort_images_file is None:
             self.assertTrue(validate_cortical_images_file(cort_images_file, 10, True))
 
     def test_successful_model_run_with_funcdata(self):
@@ -191,8 +191,8 @@ class TestSCODataStoreWorker(unittest.TestCase):
             self.assertTrue(os.path.isfile(filename))
             if attmnt.filename == 'cortical-images.tar.gz':
                 cort_images_file = filename
-        #self.assertNotIsNone(cort_images_file)
-        if not is None cort_images_file:
+        #self.assertIsNotNone(cort_images_file)
+        if not cort_images_file is None:
             self.assertTrue(validate_cortical_images_file(cort_images_file, 10, True))
 
 
