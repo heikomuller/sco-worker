@@ -8,6 +8,7 @@ import tarfile
 import tempfile
 
 import sco
+from cortical import create_cortical_image_tar
 
 
 def sco_run(model_run, model_def, subject, image_group, output_dir, fmri_data=None):
@@ -76,23 +77,16 @@ def sco_run(model_run, model_def, subject, image_group, output_dir, fmri_data=No
             f.write(img.folder + img.name + '\n')
     # Add image list file as attachments
     attachments['images.txt'] = (image_list_file, 'text/plain')
-
-    # Add further attachments that are defined in the model output list (if
-    # present)
-    for attmnt in model_def.outputs.attachments:
-        a_filename = os.path.join(output_dir, attmnt.path)
-        if os.path.isfile(a_filename):
-            attachments[attmnt.filename] = (a_filename, attmnt.mime_type)
-    #
-    # Create additional attachments here
-    #
-    #cortical_tar = create_cortical_image_tar(
-    #    data,
-    #    image_group.images,
-    #    args['measurements_filename'],
-    #    output_dir
-    #)
-    #attachments['cortical-image-list'] = cortical_tar
+    cortical_tar = create_cortical_image_tar(
+        data,
+        image_group,
+        args['measurements_filename'],
+        output_dir
+    )
+    attachments[cortical_tar] = (
+        os.path.join(output_dir, cortical_tar),
+        'application/tar'
+    )
 
     # Return information about generated files
     return prediction_file, attachments

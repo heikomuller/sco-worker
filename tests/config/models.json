@@ -140,8 +140,8 @@
                     "mimeType" : "application/json"
                 },
                 {
-                    "filename" : "cortical-images.tar.gz",
-                    "mimeType" : "application/gzip"
+                    "filename" : "cortical-images.tar",
+                    "mimeType" : "application/tar"
                 }
             ]
         },
@@ -296,8 +296,8 @@
                     "mimeType" : "application/application"
                 },
                 {
-                    "filename" : "cortical-images.tar.gz",
-                    "mimeType" : "application/gzip"
+                    "filename" : "cortical-images.tar",
+                    "mimeType" : "application/tar"
                 }
             ]
         },

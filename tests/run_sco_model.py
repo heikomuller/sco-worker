@@ -72,7 +72,7 @@ if generate_cortical_images:
     pred_dat = pred_nii.dataobj.get_unscaled()
 
 
-    func_nii = nib.load(func_filename)
+    func_nii = nib.load(func_filename )
     func_hdr = func_nii.header
     func_dat = func_nii.dataobj.get_unscaled()
 
